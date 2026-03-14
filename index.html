@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Company Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #08080f;
+    --bg2: #0f0f1a;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --purple: #7c3aed;
+    --green: #10b981;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+  
+  /* Header */
+  header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+  .pulse { width: 10px; height: 10px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+  .header-right { display: flex; align-items: center; gap: 20px; font-size: 13px; color: var(--muted); }
+  .berlin-time { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); }
+  .refresh-badge { background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4); color: #a78bfa; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+
+  /* Layout */
+  main { padding: 24px; max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+  /* CEO Alerts */
+  .ceo-alerts { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 20px; }
+  .ceo-alerts h2 { color: var(--red); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .todo-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(239,68,68,0.1); }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-dot { width: 8px; height: 8px; background: var(--red); border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .todo-text { font-size: 14px; }
+  .todo-deadline { font-size: 11px; color: var(--red); margin-top: 2px; font-weight: 500; }
+
+  /* Grid */
+  .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:768px) { .projects-grid { grid-template-columns: 1fr; } }
+
+  /* Cards */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); transition: border-color .2s; }
+  .card:hover { border-color: rgba(124,58,237,0.4); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .ci-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .ci-green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .ci-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .ci-loading { background: rgba(100,116,139,0.15); color: var(--muted); border: 1px solid rgba(100,116,139,0.3); }
+
+  /* Countdown */
+  .countdown { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); border-radius: 10px; padding: 14px; margin: 12px 0; text-align: center; }
+  .countdown-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .countdown-time { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: #a78bfa; }
+  .countdown-units { display: flex; justify-content: center; gap: 20px; margin-top: 4px; font-size: 10px; color: var(--muted); }
+
+  /* Milestones */
+  .milestones { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .milestone { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); }
+  .milestone.past { color: var(--green); border-color: rgba(16,185,129,0.3); }
+  .milestone.urgent { color: var(--yellow); border-color: rgba(245,158,11,0.3); }
+
+  /* PRs */
+  .pr-list { margin-top: 12px; }
+  .pr-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .pr-item:last-child { border-bottom: none; }
+  .pr-num { color: var(--purple); font-family: monospace; font-weight: 600; flex-shrink: 0; }
+  .pr-title { color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .empty-state { color: var(--muted); font-size: 13px; text-align: center; padding: 16px; }
+
+  /* Team Status */
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .agent-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .agent-name { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+  .agent-status { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; }
+  .dot-green { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-blue { background: var(--blue); }
+
+  /* Activity */
+  .activity-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-repo { background: rgba(124,58,237,0.15); color: #a78bfa; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
+  .activity-msg { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .activity-time { color: var(--muted); font-size: 11px; white-space: nowrap; }
+
+  /* Section titles */
+  .section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; }
+  
+  /* Stat row */
+  .stat-row { display: flex; gap: 16px; margin-bottom: 12px; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 24px; font-weight: 700; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .stat-green { color: var(--green); }
+  .stat-blue { color: var(--blue); }
+  .stat-red { color: var(--red); }
+
+  /* Token input */
+  .token-bar { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .token-bar input { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: var(--text); font-size: 13px; flex: 1; min-width: 200px; font-family: monospace; }
+  .token-bar button { background: var(--blue); color: white; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .token-bar label { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="pulse"></div>
+    AI Company Dashboard
+  </div>
+  <div class="header-right">
+    <div class="berlin-time" id="clock">--:--:-- CET</div>
+    <div class="refresh-badge" id="refresh-badge">↻ 60s</div>
+    <div id="last-updated" style="font-size:11px">Lädt...</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- GitHub Token -->
+  <div class="token-bar" id="token-bar">
+    <label>🔑 GitHub Token (für private Repos):</label>
+    <input type="password" id="gh-token" placeholder="ghp_..." value="">
+    <button onclick="saveToken()">Speichern</button>
+    <span style="font-size:12px;color:var(--muted)">Wird nur lokal gespeichert (localStorage)</span>
+  </div>
+
+  <!-- CEO Alerts -->
+  <div class="ceo-alerts">
+    <h2>🔴 CEO — Ausstehende Aktionen</h2>
+    <div class="todo-item">
+      <div class="todo-dot"></div>
+      <div>
+        <div class="todo-text">App Store Connect: Paid Apps Agreement + Bankverbindung eintragen</div>
+        <div class="todo-deadline">⚠️ Deadline: 22. März 2026 — in <span id="days-22mar"></span> Tagen | appstoreconnect.apple.com → Agreements, Tax &amp; Banking</div>
+      </div>
+    </div>
+    <div class="todo-item">
+      <div class="todo-dot"></div>
+      <div>
+        <div class="todo-text">GitHub Secrets für Split Genesis CI eintragen: SUPABASE_URL + SUPABASE_ANON_KEY</div>
+        <div class="todo-deadline">→ github.com/salahxiv/split-genesis/settings/secrets/actions</div>
+      </div>
+    </div>
+    <div class="todo-item">
+      <div class="todo-dot"></div>
+      <div>
+        <div class="todo-text">Privates Repo "amber-certificates" erstellen + fastlane match appstore lokal ausführen</div>
+        <div class="todo-deadline">→ Anleitung: salahxiv/Amber → fastlane/README_SETUP.md</div>
+      </div>
+    </div>
+    <div class="todo-item">
+      <div class="todo-dot"></div>
+      <div>
+        <div class="todo-text">Bugsink auf Hetzner deployen + DSN-URL in Xcode Info.plist eintragen</div>
+        <div class="todo-deadline">→ docker run -p 8000:8000 bugsink/bugsink</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="projects-grid">
+    <!-- Amber -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🍊 Amber (EyeRest)</div>
+        <div class="ci-badge ci-loading" id="amber-ci">⟳ CI...</div>
+      </div>
+      <div class="countdown">
+        <div class="countdown-label">🚀 Launch Countdown</div>
+        <div class="countdown-time" id="amber-countdown">--d --h --m --s</div>
+        <div class="countdown-units">
+          <span>Tage</span><span>Stunden</span><span>Minuten</span><span>Sekunden</span>
+        </div>
+      </div>
+      <div class="milestones">
+        <span class="milestone" id="ms-freeze">Code Freeze 6. Apr</span>
+        <span class="milestone" id="ms-tf">TestFlight 12. Apr</span>
+        <span class="milestone" id="ms-submit">Submit 21. Apr</span>
+        <span class="milestone urgent" id="ms-launch">Launch 29. Apr 🎉</span>
+      </div>
+      <div style="margin-top:16px">
+        <div class="section-title">Offene PRs</div>
+        <div class="pr-list" id="amber-prs"><div class="empty-state">Lädt...</div></div>
+      </div>
+    </div>
+
+    <!-- Split -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">💸 Split Genesis</div>
+        <div class="ci-badge ci-loading" id="split-ci">⟳ CI...</div>
+      </div>
+      <div style="display:flex;gap:20px;margin-bottom:12px">
+        <div class="stat"><div class="stat-num stat-blue" id="split-prs-count">-</div><div class="stat-label">Offene PRs</div></div>
+        <div class="stat"><div class="stat-num stat-red" id="split-issues-count">-</div><div class="stat-label">Offene Issues</div></div>
+      </div>
+      <div class="section-title">Offene PRs</div>
+      <div class="pr-list" id="split-prs"><div class="empty-state">Lädt...</div></div>
+    </div>
+  </div>
+
+  <!-- Team Status -->
+  <div class="card">
+    <div class="section-title">👥 Team Status — Sprint 12</div>
+    <div class="team-grid">
+      <div class="agent-card">
+        <div class="agent-name">🏗️ CTO</div>
+        <div class="agent-status"><span class="status-dot dot-green"></span>PRs mergen, CI debuggen<br>Split Genesis CI rot → Fix läuft</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">💻 SeniorDev</div>
+        <div class="agent-status"><span class="status-dot dot-yellow"></span>Sprint 11 fertig<br>Accessibility ✅ | ntfy.sh ✅ | Sound ✅</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">🎯 ProductOwner</div>
+        <div class="agent-status"><span class="status-dot dot-blue"></span>Roadmap & Backlog fertig<br>15 Issues erstellt, App Store Texte ready</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">📣 Marketing</div>
+        <div class="agent-status"><span class="status-dot dot-green"></span>Product Hunt Draft ✅<br>ASO Keywords optimiert ✅<br>Reddit Kalender erstellt ✅</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">🔍 SEO</div>
+        <div class="agent-status"><span class="status-dot dot-yellow"></span>Wartet auf Landing Page<br>Split Genesis README ✅</div>
+      </div>
+      <div class="agent-card">
+        <div class="agent-name">📋 Secretary</div>
+        <div class="agent-status"><span class="status-dot dot-green"></span>Koordiniert Team<br>CEO Todos getrackt ✅</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Communication -->
+  <div class="card">
+    <div class="section-title">💬 Team Kommunikation (team-discussion.md)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:12px;color:var(--purple);font-weight:600;margin-bottom:10px">🍊 Amber</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8">
+          <b style="color:var(--text)">CTO:</b> Aurora/Cosmic Themes sind Pro-only. RevenueCat Paywall muss korrekt sperren.<br>
+          <b style="color:var(--text)">CTO:</b> Bugsink DSN in Info.plist eintragen (CEO-TODO).<br>
+          <b style="color:var(--text)">SeniorDev:</b> 82 Unit Tests erstellt. Accessibility Audit fertig.<br>
+          <b style="color:var(--text)">PO:</b> Code Freeze 6. April — noch 3 Wochen. App Store Metadaten ready.
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:10px">💸 Split Genesis</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8">
+          <b style="color:var(--text)">CTO:</b> QR Code Flow sicher via SyncService.findGroupById().<br>
+          <b style="color:var(--text)">CTO:</b> Cent-Arithmetik ist Foundation für Multi-Currency.<br>
+          <b style="color:var(--text)">SeniorDev:</b> Auth Persistenz via Keychain ✅. ntfy.sh Push ✅.<br>
+          <b style="color:var(--text)">DevOps:</b> GitHub Secrets #31 ÜBERFÄLLIG — CEO muss handeln!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Feed -->
+  <div class="card">
+    <div class="section-title">⚡ Letzte GitHub Aktivität</div>
+    <div id="activity-feed"><div class="empty-state">Lädt Commits...</div></div>
+  </div>
+
+</main>
+
+<script>
+const REPOS = {
+  amber: 'salahxiv/Amber',
+  split: 'salahxiv/split-genesis',
+  factory: 'salahxiv/ai-factory'
+};
+
+function getToken() { return localStorage.getItem('gh_token') || ''; }
+function saveToken() {
+  const t = document.getElementById('gh-token').value;
+  localStorage.setItem('gh_token', t);
+  document.getElementById('token-bar').style.display = 'none';
+  fetchAll();
+}
+
+function headers() {
+  const t = getToken();
+  return t ? { 'Authorization': `token ${t}` } : {};
+}
+
+async function ghFetch(url) {
+  try {
+    const r = await fetch(`https://api.github.com/${url}`, { headers: headers() });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+// Berlin Time Clock
+function updateClock() {
+  const now = new Date();
+  const berlin = new Intl.DateTimeFormat('de-DE', {
+    timeZone: 'Europe/Berlin', hour:'2-digit', minute:'2-digit', second:'2-digit'
+  }).format(now);
+  document.getElementById('clock').textContent = berlin + ' CET';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Countdown to April 29
+function updateCountdown() {
+  const launch = new Date('2026-04-29T00:00:00+02:00');
+  const now = new Date();
+  const diff = launch - now;
+  if (diff <= 0) { document.getElementById('amber-countdown').textContent = '🎉 LIVE!'; return; }
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  document.getElementById('amber-countdown').textContent = `${d}d ${h}h ${m}m ${s}s`;
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// Days until Mar 22
+function updateDeadlines() {
+  const mar22 = new Date('2026-03-22T00:00:00+01:00');
+  const now = new Date();
+  const days = Math.ceil((mar22-now)/86400000);
+  document.getElementById('days-22mar').textContent = days > 0 ? days : '⚠️ ÜBERFÄLLIG';
+}
+updateDeadlines();
+
+// Fetch PRs
+async function fetchPRs(repo, listId, countId, ciBadgeId) {
+  const prs = await ghFetch(`repos/${repo}/pulls?state=open&per_page=10`);
+  const runs = await ghFetch(`repos/${repo}/actions/runs?per_page=1`);
+  
+  // CI Badge
+  if (runs && runs.workflow_runs && runs.workflow_runs[0]) {
+    const run = runs.workflow_runs[0];
+    const badge = document.getElementById(ciBadgeId);
+    if (run.conclusion === 'success') {
+      badge.textContent = '✅ CI Grün';
+      badge.className = 'ci-badge ci-green';
+    } else if (run.conclusion === 'failure') {
+      badge.textContent = '❌ CI Rot';
+      badge.className = 'ci-badge ci-red';
+    } else {
+      badge.textContent = '🔄 CI läuft';
+      badge.className = 'ci-badge ci-loading';
+    }
+  }
+  
+  // PRs
+  const listEl = document.getElementById(listId);
+  if (!prs || prs.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">✅ Keine offenen PRs</div>';
+    if (countId) document.getElementById(countId).textContent = '0';
+    return;
+  }
+  if (countId) document.getElementById(countId).textContent = prs.length;
+  listEl.innerHTML = prs.slice(0,5).map(pr => `
+    <div class="pr-item">
+      <span class="pr-num">#${pr.number}</span>
+      <span class="pr-title" title="${pr.title}">${pr.title}</span>
+    </div>
+  `).join('');
+}
+
+// Fetch Issues count
+async function fetchIssues(repo, countId) {
+  const issues = await ghFetch(`repos/${repo}/issues?state=open&per_page=1`);
+  // GitHub returns issues + PRs, use link header or just show count
+  if (issues && countId) {
+    document.getElementById(countId).textContent = issues.length > 0 ? '...' : '0';
+  }
+}
+
+// Activity Feed
+async function fetchActivity() {
+  const [amberCommits, splitCommits] = await Promise.all([
+    ghFetch(`repos/${REPOS.amber}/commits?per_page=5`),
+    ghFetch(`repos/${REPOS.split}/commits?per_page=5`)
+  ]);
+  
+  let items = [];
+  const addCommits = (commits, repo) => {
+    if (!commits) return;
+    commits.forEach(c => items.push({
+      repo: repo === REPOS.amber ? 'Amber' : 'Split',
+      msg: c.commit.message.split('\n')[0].substring(0, 60),
+      time: new Date(c.commit.committer.date),
+      url: c.html_url
+    }));
+  };
+  addCommits(amberCommits, REPOS.amber);
+  addCommits(splitCommits, REPOS.split);
+  items.sort((a,b) => b.time - a.time);
+  
+  const feed = document.getElementById('activity-feed');
+  if (items.length === 0) { feed.innerHTML = '<div class="empty-state">Keine Daten</div>'; return; }
+  
+  feed.innerHTML = items.slice(0,10).map(i => {
+    const ago = Math.floor((Date.now() - i.time)/60000);
+    const timeAgo = ago < 60 ? `${ago}m` : `${Math.floor(ago/60)}h`;
+    return `<div class="activity-item">
+      <span class="activity-repo">${i.repo}</span>
+      <span class="activity-msg">${i.msg}</span>
+      <span class="activity-time">${timeAgo} ago</span>
+    </div>`;
+  }).join('');
+}
+
+// Auto refresh
+let countdown = 60;
+function tick() {
+  countdown--;
+  document.getElementById('refresh-badge').textContent = `↻ ${countdown}s`;
+  if (countdown <= 0) { countdown = 60; fetchAll(); }
+}
+setInterval(tick, 1000);
+
+async function fetchAll() {
+  document.getElementById('last-updated').textContent = 'Aktualisiert: ' + new Date().toLocaleTimeString('de-DE', {timeZone:'Europe/Berlin'});
+  await Promise.all([
+    fetchPRs(REPOS.amber, 'amber-prs', null, 'amber-ci'),
+    fetchPRs(REPOS.split, 'split-prs', 'split-prs-count', 'split-ci'),
+    fetchActivity()
+  ]);
+}
+
+// Init
+if (getToken()) document.getElementById('token-bar').style.display = 'none';
+else document.getElementById('gh-token').value = getToken();
+fetchAll();
+</script>
+</body>
+</html>
