@@ -1,447 +1,1252 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Company Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>👑 AI Empire HQ — CEO Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --bg: #08080f;
-    --bg2: #0f0f1a;
-    --card: rgba(255,255,255,0.04);
-    --border: rgba(255,255,255,0.08);
-    --purple: #7c3aed;
+    --purple: #a855f7;
+    --purple-dark: #7c3aed;
+    --cyan: #06b6d4;
+    --cyan-light: #22d3ee;
     --green: #10b981;
+    --green-light: #34d399;
     --red: #ef4444;
-    --blue: #3b82f6;
-    --yellow: #f59e0b;
+    --orange: #f97316;
+    --yellow: #eab308;
+    --bg: #030712;
+    --bg2: #0a0f1e;
+    --bg3: #0f172a;
+    --card: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.08);
     --text: #e2e8f0;
-    --muted: #64748b;
+    --text-dim: #64748b;
+    --glow-purple: 0 0 20px rgba(168, 85, 247, 0.4);
+    --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.4);
+    --glow-green: 0 0 20px rgba(16, 185, 129, 0.4);
   }
-  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
-  
-  /* Header */
-  header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
-  .pulse { width: 10px; height: 10px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
-  .header-right { display: flex; align-items: center; gap: 20px; font-size: 13px; color: var(--muted); }
-  .berlin-time { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); }
-  .refresh-badge { background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4); color: #a78bfa; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
 
-  /* Layout */
-  main { padding: 24px; max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* CEO Alerts */
-  .ceo-alerts { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 20px; }
-  .ceo-alerts h2 { color: var(--red); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .todo-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(239,68,68,0.1); }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #particle-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* ─── VIBE BANNER ─── */
+  .vibe-banner {
+    text-align: center;
+    padding: 16px 24px;
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(6,182,212,0.15));
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    animation: pulse-border 3s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+  }
+  .vibe-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent 0%, rgba(168,85,247,0.05) 25%, transparent 50%);
+    animation: spin 8s linear infinite;
+  }
+  .vibe-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--purple);
+    letter-spacing: 0.02em;
+    position: relative;
+    z-index: 1;
+  }
+  .vibe-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .header-left h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, var(--purple) 50%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+  .header-left p {
+    color: var(--text-dim);
+    font-size: 0.875rem;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 4px;
+  }
+  .header-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green);
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  .sprint-badge {
+    padding: 6px 14px;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--purple);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── COUNTDOWN ─── */
+  .countdown-section {
+    background: linear-gradient(135deg, rgba(168,85,247,0.1) 0%, rgba(6,182,212,0.1) 100%);
+    border: 1px solid rgba(168,85,247,0.25);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  .countdown-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(168,85,247,0.2), transparent 70%);
+    pointer-events: none;
+  }
+  .countdown-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .countdown-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .countdown-t {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--purple);
+    text-shadow: 0 0 30px rgba(168,85,247,0.6), 0 0 60px rgba(168,85,247,0.3);
+    animation: count-pulse 2s ease-in-out infinite;
+    line-height: 1;
+  }
+  .countdown-sub {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .countdown-rocket {
+    font-size: 3rem;
+    animation: rocket-shake 2s ease-in-out infinite;
+  }
+  .milestones {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .milestone-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .milestone-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--cyan);
+  }
+  .milestone-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .milestone-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .milestone-line {
+    width: 40px; height: 1px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+    margin-top: 4px;
+  }
+
+  /* ─── GRID ─── */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .grid-2-rev {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-3, .grid-2, .grid-2-rev { grid-template-columns: 1fr; }
+    .countdown-t { font-size: 2.5rem; }
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover {
+    border-color: rgba(168,85,247,0.3);
+    box-shadow: 0 8px 32px rgba(168,85,247,0.1);
+    transform: translateY(-2px);
+  }
+  .card-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ─── CEO POWER BAR ─── */
+  .ceo-card {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.03);
+    animation: alert-glow 3s ease-in-out infinite;
+  }
+  .ceo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .ceo-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--red); font-family: 'JetBrains Mono', monospace; }
+  .ceo-badge {
+    padding: 4px 10px;
+    background: rgba(239,68,68,0.2);
+    border: 1px solid rgba(239,68,68,0.4);
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: var(--red);
+    font-family: 'JetBrains Mono', monospace;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  .power-bar-wrap {
+    margin-bottom: 16px;
+  }
+  .power-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    color: var(--text-dim);
+  }
+  .power-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .power-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--orange));
+    border-radius: 4px;
+    animation: bar-fill 1s ease-out forwards;
+    box-shadow: 0 0 10px rgba(239,68,68,0.5);
+  }
+  .unlock-text {
+    font-size: 0.75rem;
+    color: var(--orange);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 8px;
+    border: 1px dashed rgba(249,115,22,0.3);
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .todo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.85rem;
+  }
   .todo-item:last-child { border-bottom: none; }
-  .todo-dot { width: 8px; height: 8px; background: var(--red); border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-  .todo-text { font-size: 14px; }
-  .todo-deadline { font-size: 11px; color: var(--red); margin-top: 2px; font-weight: 500; }
+  .todo-icon { font-size: 1rem; flex-shrink: 0; }
+  .todo-text { color: var(--text); line-height: 1.4; }
+  .todo-deadline {
+    font-size: 0.7rem;
+    color: var(--red);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+  }
 
-  /* Grid */
-  .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media(max-width:768px) { .projects-grid { grid-template-columns: 1fr; } }
+  /* ─── TEAM CARDS ─── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .team-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px;
+    transition: all 0.3s ease;
+  }
+  .team-card:hover {
+    border-color: rgba(168,85,247,0.25);
+    background: rgba(168,85,247,0.04);
+  }
+  .team-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .team-status {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .energy-bar-wrap { position: relative; }
+  .energy-bar-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .energy-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    position: relative;
+    transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .energy-label {
+    position: absolute;
+    right: 0; top: -18px;
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
 
-  /* Cards */
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); transition: border-color .2s; }
-  .card:hover { border-color: rgba(124,58,237,0.4); }
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-  .card-title { font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px; }
-  .ci-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
-  .ci-green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
-  .ci-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
-  .ci-loading { background: rgba(100,116,139,0.15); color: var(--muted); border: 1px solid rgba(100,116,139,0.3); }
+  /* ─── WINS ─── */
+  .wins-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .win-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(16,185,129,0.05);
+    border: 1px solid rgba(16,185,129,0.15);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    animation: win-appear 0.5s ease-out forwards;
+    opacity: 0;
+  }
+  .win-item:hover {
+    background: rgba(16,185,129,0.1);
+    border-color: rgba(16,185,129,0.3);
+  }
+  .win-check { color: var(--green); font-size: 1rem; }
+  .wins-count {
+    text-align: center;
+    padding: 12px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(16,185,129,0.5);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .wins-subtitle {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+  }
 
-  /* Countdown */
-  .countdown { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); border-radius: 10px; padding: 14px; margin: 12px 0; text-align: center; }
-  .countdown-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .countdown-time { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: #a78bfa; }
-  .countdown-units { display: flex; justify-content: center; gap: 20px; margin-top: 4px; font-size: 10px; color: var(--muted); }
+  /* ─── REPO CARDS ─── */
+  .repo-card { grid-column: span 1; }
+  .repo-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .repo-meta {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 16px;
+  }
+  .repo-stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat-pill.pr { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: var(--purple); }
+  .stat-pill.ci { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--green); }
+  .stat-pill.commit { background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); color: var(--cyan); }
+  .commit-dots {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .commit-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    background: var(--green);
+    opacity: 0.3;
+    animation: dot-pulse 2s ease-in-out infinite;
+  }
+  .commit-dot.active { opacity: 1; box-shadow: 0 0 6px var(--green); }
+  .commit-dot.medium { opacity: 0.6; }
 
-  /* Milestones */
-  .milestones { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .milestone { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); }
-  .milestone.past { color: var(--green); border-color: rgba(16,185,129,0.3); }
-  .milestone.urgent { color: var(--yellow); border-color: rgba(245,158,11,0.3); }
+  /* ─── SPRINT COUNTER ─── */
+  .sprint-card {
+    border-color: rgba(168,85,247,0.25);
+    background: rgba(168,85,247,0.03);
+  }
+  .sprint-number {
+    font-size: 3.5rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+  .sprint-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .sprint-fire {
+    font-size: 2rem;
+    animation: fire-dance 0.5s ease-in-out infinite alternate;
+    display: inline-block;
+  }
+  .pr-count {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 8px;
+  }
+  .never-sleeps {
+    font-size: 0.75rem;
+    color: var(--orange);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 8px;
+    animation: glow-text-orange 2s ease-in-out infinite;
+  }
 
-  /* PRs */
-  .pr-list { margin-top: 12px; }
-  .pr-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .pr-item:last-child { border-bottom: none; }
-  .pr-num { color: var(--purple); font-family: monospace; font-weight: 600; flex-shrink: 0; }
-  .pr-title { color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .empty-state { color: var(--muted); font-size: 13px; text-align: center; padding: 16px; }
+  /* ─── FOOTER ─── */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 32px;
+  }
 
-  /* Team Status */
-  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-  .agent-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-  .agent-name { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
-  .agent-status { font-size: 12px; color: var(--muted); line-height: 1.5; }
-  .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; }
-  .dot-green { background: var(--green); }
-  .dot-yellow { background: var(--yellow); }
-  .dot-blue { background: var(--blue); }
+  /* ─── ANIMATIONS ─── */
+  @keyframes pulse-border {
+    0%, 100% { border-color: rgba(168,85,247,0.3); box-shadow: none; }
+    50% { border-color: rgba(168,85,247,0.6); box-shadow: 0 0 20px rgba(168,85,247,0.15); }
+  }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes count-pulse {
+    0%, 100% { text-shadow: 0 0 30px rgba(168,85,247,0.6), 0 0 60px rgba(168,85,247,0.3); transform: scale(1); }
+    50% { text-shadow: 0 0 50px rgba(168,85,247,0.9), 0 0 100px rgba(168,85,247,0.5); transform: scale(1.02); }
+  }
+  @keyframes rocket-shake {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-8px) rotate(5deg); }
+  }
+  @keyframes alert-glow {
+    0%, 100% { box-shadow: none; }
+    50% { box-shadow: 0 0 20px rgba(239,68,68,0.1); }
+  }
+  @keyframes bar-fill {
+    from { width: 0%; }
+  }
+  @keyframes win-appear {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes dot-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+  @keyframes fire-dance {
+    from { transform: rotate(-5deg) scale(1); }
+    to { transform: rotate(5deg) scale(1.1); }
+  }
+  @keyframes glow-text-orange {
+    0%, 100% { color: var(--orange); text-shadow: none; }
+    50% { text-shadow: 0 0 10px rgba(249,115,22,0.5); }
+  }
+  @keyframes float-up {
+    0% { opacity: 0; transform: translateY(0); }
+    10% { opacity: 1; }
+    90% { opacity: 0.8; }
+    100% { opacity: 0; transform: translateY(-100px); }
+  }
+  @keyframes loading-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 
-  /* Activity */
-  .activity-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .activity-item:last-child { border-bottom: none; }
-  .activity-repo { background: rgba(124,58,237,0.15); color: #a78bfa; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
-  .activity-msg { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .activity-time { color: var(--muted); font-size: 11px; white-space: nowrap; }
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+    border-radius: 4px;
+    height: 16px;
+  }
 
-  /* Section titles */
-  .section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; }
-  
-  /* Stat row */
-  .stat-row { display: flex; gap: 16px; margin-bottom: 12px; }
-  .stat { text-align: center; }
-  .stat-num { font-size: 24px; font-weight: 700; }
-  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .stat-green { color: var(--green); }
-  .stat-blue { color: var(--blue); }
-  .stat-red { color: var(--red); }
+  .confetti-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    font-size: 1.2rem;
+    animation: float-up 3s ease-out forwards;
+  }
 
-  /* Token input */
-  .token-bar { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .token-bar input { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: var(--text); font-size: 13px; flex: 1; min-width: 200px; font-family: monospace; }
-  .token-bar button { background: var(--blue); color: white; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  .token-bar label { font-size: 13px; color: var(--muted); }
+  .separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(168,85,247,0.2), rgba(6,182,212,0.2), transparent);
+    margin: 8px 0;
+  }
+
+  .ci-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .ci-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .ci-dot.pass { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .ci-dot.fail { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .ci-dot.running { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); animation: blink 1s infinite; }
+
+  .glow-purple { color: var(--purple); text-shadow: 0 0 10px rgba(168,85,247,0.5); }
+  .glow-cyan { color: var(--cyan); text-shadow: 0 0 10px rgba(6,182,212,0.5); }
+  .glow-green { color: var(--green); text-shadow: 0 0 10px rgba(16,185,129,0.5); }
+
+  .section-spacer { margin-bottom: 24px; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .tag.critical { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .tag.hot { background: rgba(249,115,22,0.2); color: var(--orange); border: 1px solid rgba(249,115,22,0.3); }
+
+  /* Loading state */
+  .loading-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
 </style>
 </head>
 <body>
+<canvas id="particle-canvas"></canvas>
 
-<header>
-  <div class="logo">
-    <div class="pulse"></div>
-    AI Company Dashboard
-  </div>
-  <div class="header-right">
-    <div class="berlin-time" id="clock">--:--:-- CET</div>
-    <div class="refresh-badge" id="refresh-badge">↻ 60s</div>
-    <div id="last-updated" style="font-size:11px">Lädt...</div>
-  </div>
-</header>
+<div class="content">
 
-<main>
-
-  <!-- GitHub Token -->
-  <div class="token-bar" id="token-bar">
-    <label>🔑 GitHub Token (für private Repos):</label>
-    <input type="password" id="gh-token" placeholder="ghp_..." value="">
-    <button onclick="saveToken()">Speichern</button>
-    <span style="font-size:12px;color:var(--muted)">Wird nur lokal gespeichert (localStorage)</span>
+  <!-- VIBE BANNER -->
+  <div class="vibe-banner">
+    <div class="vibe-label">🧠 Today's Vibe</div>
+    <div class="vibe-text" id="vibe-text">Loading vibe...</div>
   </div>
 
-  <!-- CEO Alerts -->
-  <div class="ceo-alerts">
-    <h2>🔴 CEO — Ausstehende Aktionen</h2>
-    <div class="todo-item">
-      <div class="todo-dot"></div>
-      <div>
-        <div class="todo-text">App Store Connect: Paid Apps Agreement + Bankverbindung eintragen</div>
-        <div class="todo-deadline">⚠️ Deadline: 22. März 2026 — in <span id="days-22mar"></span> Tagen | appstoreconnect.apple.com → Agreements, Tax &amp; Banking</div>
-      </div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>👑 AI Empire HQ</h1>
+      <p id="current-time">── CEO Dashboard · <span id="time-display">loading...</span></p>
     </div>
-    <div class="todo-item">
-      <div class="todo-dot"></div>
-      <div>
-        <div class="todo-text">GitHub Secrets für Split Genesis CI eintragen: SUPABASE_URL + SUPABASE_ANON_KEY</div>
-        <div class="todo-deadline">→ github.com/salahxiv/split-genesis/settings/secrets/actions</div>
+    <div class="header-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        LIVE
       </div>
-    </div>
-    <div class="todo-item">
-      <div class="todo-dot"></div>
-      <div>
-        <div class="todo-text">Privates Repo "amber-certificates" erstellen + fastlane match appstore lokal ausführen</div>
-        <div class="todo-deadline">→ Anleitung: salahxiv/Amber → fastlane/README_SETUP.md</div>
-      </div>
-    </div>
-    <div class="todo-item">
-      <div class="todo-dot"></div>
-      <div>
-        <div class="todo-text">Bugsink auf Hetzner deployen + DSN-URL in Xcode Info.plist eintragen</div>
-        <div class="todo-deadline">→ docker run -p 8000:8000 bugsink/bugsink</div>
-      </div>
+      <div class="sprint-badge">⚡ SPRINT #12</div>
     </div>
   </div>
 
-  <!-- Projects -->
-  <div class="projects-grid">
-    <!-- Amber -->
+  <!-- COUNTDOWN -->
+  <div class="countdown-section">
+    <div class="countdown-label">🚀 AMBER APP STORE LAUNCH · COUNTDOWN ACTIVE</div>
+    <div class="countdown-main">
+      <div class="countdown-rocket">🚀</div>
+      <div>
+        <div class="countdown-t" id="countdown-days">T-46</div>
+        <div class="countdown-sub">DAYS TO LAUNCH</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:0.8rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace;">29. APRIL 2026</div>
+        <div style="font-size:1rem; font-weight:600; margin-top:4px;">🌟 AMBER IS GOING LIVE</div>
+      </div>
+    </div>
+    <div class="milestones">
+      <div class="milestone-item">
+        <div class="milestone-date">APR 06</div>
+        <div class="milestone-dot" style="background:var(--purple); box-shadow: 0 0 8px var(--purple);"></div>
+        <div class="milestone-label">Code Freeze ❄️</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-top:18px;"><div style="width:30px;height:1px;background:linear-gradient(90deg,var(--purple),var(--cyan));"></div></div>
+      <div class="milestone-item">
+        <div class="milestone-date">APR 12</div>
+        <div class="milestone-dot" style="background:var(--cyan); box-shadow: 0 0 8px var(--cyan);"></div>
+        <div class="milestone-label">TestFlight 🧪</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-top:18px;"><div style="width:30px;height:1px;background:linear-gradient(90deg,var(--cyan),var(--green));"></div></div>
+      <div class="milestone-item">
+        <div class="milestone-date">APR 21</div>
+        <div class="milestone-dot" style="background:var(--green); box-shadow: 0 0 8px var(--green);"></div>
+        <div class="milestone-label">App Store Submit 📦</div>
+      </div>
+      <div style="display:flex;align-items:center;padding-top:18px;"><div style="width:30px;height:1px;background:linear-gradient(90deg,var(--green),var(--yellow));"></div></div>
+      <div class="milestone-item">
+        <div class="milestone-date">APR 29</div>
+        <div class="milestone-dot" style="background:var(--yellow); box-shadow: 0 0 8px var(--yellow); animation:blink 1s infinite;"></div>
+        <div class="milestone-label">🚀 LAUNCH 🎉</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Sprint + CEO Power Bar -->
+  <div class="grid-2-rev section-spacer">
+
+    <!-- CEO POWER BAR -->
+    <div class="card ceo-card">
+      <div class="ceo-header">
+        <div class="ceo-title">⚡ CEO Action Queue</div>
+        <div class="ceo-badge">4 BLOCKING 🔒</div>
+      </div>
+      <div class="unlock-text">Complete these to unlock launch mode 🔓</div>
+      <div class="power-bar-wrap">
+        <div class="power-bar-label">
+          <span>Launch Readiness</span>
+          <span style="color:var(--red);">25%</span>
+        </div>
+        <div class="power-bar">
+          <div class="power-bar-fill" style="width:25%"></div>
+        </div>
+      </div>
+      <div class="todo-item">
+        <div class="todo-icon">🏦</div>
+        <div>
+          <div class="todo-text">App Store Connect Bankverbindung <span class="tag critical">KRITISCH</span></div>
+          <div class="todo-deadline">⏰ Deadline: 22. März 2026</div>
+        </div>
+      </div>
+      <div class="todo-item">
+        <div class="todo-icon">🔐</div>
+        <div>
+          <div class="todo-text">GitHub Secrets — Split Genesis CI <span class="tag hot">HOT</span></div>
+          <div class="todo-deadline">🔑 Blocks CI pipeline</div>
+        </div>
+      </div>
+      <div class="todo-item">
+        <div class="todo-icon">📜</div>
+        <div>
+          <div class="todo-text">amber-certificates Repo + fastlane match</div>
+          <div class="todo-deadline">🔐 Blocks App Store signing</div>
+        </div>
+      </div>
+      <div class="todo-item">
+        <div class="todo-icon">🐛</div>
+        <div>
+          <div class="todo-text">Bugsink auf Hetzner deployen</div>
+          <div class="todo-deadline">🖥️ docker run -p 8000:8000 bugsink/bugsink</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPRINT CARD -->
+    <div class="card sprint-card">
+      <div class="card-title">🔥 Current Sprint</div>
+      <div class="sprint-number">#12</div>
+      <div class="sprint-label">Active Sprint · March 2026</div>
+      <div style="margin-top: 16px; padding: 12px; background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.15); border-radius: 10px;">
+        <div style="font-size:0.7rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace; margin-bottom:4px;">PRs MERGED TODAY</div>
+        <div class="pr-count" id="pr-count-today">⏳ loading...</div>
+      </div>
+      <div class="never-sleeps" style="margin-top:12px;">⚡ The team never sleeps 🔥</div>
+      <div class="separator" style="margin-top:16px;"></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+        <div style="font-size:0.72rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace;">REPOS ACTIVE:</div>
+        <div class="ci-indicator">
+          <div class="ci-dot pass" id="amber-ci"></div>
+          <span style="color:var(--text);">Amber</span>
+        </div>
+        <div class="ci-indicator">
+          <div class="ci-dot running" id="split-ci"></div>
+          <span style="color:var(--text);">Split Genesis</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Repos -->
+  <div class="grid-2 section-spacer">
+    <!-- AMBER REPO -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">🍊 Amber (EyeRest)</div>
-        <div class="ci-badge ci-loading" id="amber-ci">⟳ CI...</div>
-      </div>
-      <div class="countdown">
-        <div class="countdown-label">🚀 Launch Countdown</div>
-        <div class="countdown-time" id="amber-countdown">--d --h --m --s</div>
-        <div class="countdown-units">
-          <span>Tage</span><span>Stunden</span><span>Minuten</span><span>Sekunden</span>
+      <div class="card-title">📦 salahxiv/Amber</div>
+      <div class="repo-title">
+        <span>🍎</span> Amber — EyeRest
+        <div class="ci-indicator" id="amber-ci-badge">
+          <div class="ci-dot running"></div>
+          <span class="loading-text">checking CI...</span>
         </div>
       </div>
-      <div class="milestones">
-        <span class="milestone" id="ms-freeze">Code Freeze 6. Apr</span>
-        <span class="milestone" id="ms-tf">TestFlight 12. Apr</span>
-        <span class="milestone" id="ms-submit">Submit 21. Apr</span>
-        <span class="milestone urgent" id="ms-launch">Launch 29. Apr 🎉</span>
+      <div class="repo-meta" id="amber-meta">fetching data from GitHub...</div>
+      <div class="repo-stats" id="amber-stats">
+        <div class="stat-pill pr">⏳ loading PRs</div>
       </div>
-      <div style="margin-top:16px">
-        <div class="section-title">Offene PRs</div>
-        <div class="pr-list" id="amber-prs"><div class="empty-state">Lädt...</div></div>
+      <div style="font-size:0.7rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace; margin-bottom:6px;">RECENT ACTIVITY</div>
+      <div class="commit-dots" id="amber-dots">
+        <!-- filled by JS -->
+      </div>
+      <div style="margin-top:12px;" id="amber-commits">
+        <div class="skeleton" style="width:80%; margin-bottom:6px;"></div>
+        <div class="skeleton" style="width:60%;"></div>
       </div>
     </div>
 
-    <!-- Split -->
+    <!-- SPLIT GENESIS REPO -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title">💸 Split Genesis</div>
-        <div class="ci-badge ci-loading" id="split-ci">⟳ CI...</div>
-      </div>
-      <div style="display:flex;gap:20px;margin-bottom:12px">
-        <div class="stat"><div class="stat-num stat-blue" id="split-prs-count">-</div><div class="stat-label">Offene PRs</div></div>
-        <div class="stat"><div class="stat-num stat-red" id="split-issues-count">-</div><div class="stat-label">Offene Issues</div></div>
-      </div>
-      <div class="section-title">Offene PRs</div>
-      <div class="pr-list" id="split-prs"><div class="empty-state">Lädt...</div></div>
-    </div>
-  </div>
-
-  <!-- Team Status -->
-  <div class="card">
-    <div class="section-title">👥 Team Status — Sprint 12</div>
-    <div class="team-grid">
-      <div class="agent-card">
-        <div class="agent-name">🏗️ CTO</div>
-        <div class="agent-status"><span class="status-dot dot-green"></span>PRs mergen, CI debuggen<br>Split Genesis CI rot → Fix läuft</div>
-      </div>
-      <div class="agent-card">
-        <div class="agent-name">💻 SeniorDev</div>
-        <div class="agent-status"><span class="status-dot dot-yellow"></span>Sprint 11 fertig<br>Accessibility ✅ | ntfy.sh ✅ | Sound ✅</div>
-      </div>
-      <div class="agent-card">
-        <div class="agent-name">🎯 ProductOwner</div>
-        <div class="agent-status"><span class="status-dot dot-blue"></span>Roadmap & Backlog fertig<br>15 Issues erstellt, App Store Texte ready</div>
-      </div>
-      <div class="agent-card">
-        <div class="agent-name">📣 Marketing</div>
-        <div class="agent-status"><span class="status-dot dot-green"></span>Product Hunt Draft ✅<br>ASO Keywords optimiert ✅<br>Reddit Kalender erstellt ✅</div>
-      </div>
-      <div class="agent-card">
-        <div class="agent-name">🔍 SEO</div>
-        <div class="agent-status"><span class="status-dot dot-yellow"></span>Wartet auf Landing Page<br>Split Genesis README ✅</div>
-      </div>
-      <div class="agent-card">
-        <div class="agent-name">📋 Secretary</div>
-        <div class="agent-status"><span class="status-dot dot-green"></span>Koordiniert Team<br>CEO Todos getrackt ✅</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Team Communication -->
-  <div class="card">
-    <div class="section-title">💬 Team Kommunikation (team-discussion.md)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div>
-        <div style="font-size:12px;color:var(--purple);font-weight:600;margin-bottom:10px">🍊 Amber</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.8">
-          <b style="color:var(--text)">CTO:</b> Aurora/Cosmic Themes sind Pro-only. RevenueCat Paywall muss korrekt sperren.<br>
-          <b style="color:var(--text)">CTO:</b> Bugsink DSN in Info.plist eintragen (CEO-TODO).<br>
-          <b style="color:var(--text)">SeniorDev:</b> 82 Unit Tests erstellt. Accessibility Audit fertig.<br>
-          <b style="color:var(--text)">PO:</b> Code Freeze 6. April — noch 3 Wochen. App Store Metadaten ready.
+      <div class="card-title">📦 salahxiv/split-genesis</div>
+      <div class="repo-title">
+        <span>⚡</span> Split Genesis
+        <div class="ci-indicator" id="split-ci-badge">
+          <div class="ci-dot running"></div>
+          <span class="loading-text">checking CI...</span>
         </div>
       </div>
-      <div>
-        <div style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:10px">💸 Split Genesis</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.8">
-          <b style="color:var(--text)">CTO:</b> QR Code Flow sicher via SyncService.findGroupById().<br>
-          <b style="color:var(--text)">CTO:</b> Cent-Arithmetik ist Foundation für Multi-Currency.<br>
-          <b style="color:var(--text)">SeniorDev:</b> Auth Persistenz via Keychain ✅. ntfy.sh Push ✅.<br>
-          <b style="color:var(--text)">DevOps:</b> GitHub Secrets #31 ÜBERFÄLLIG — CEO muss handeln!
-        </div>
+      <div class="repo-meta" id="split-meta">fetching data from GitHub...</div>
+      <div class="repo-stats" id="split-stats">
+        <div class="stat-pill pr">⏳ loading PRs</div>
+      </div>
+      <div style="font-size:0.7rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace; margin-bottom:6px;">RECENT ACTIVITY</div>
+      <div class="commit-dots" id="split-dots">
+        <!-- filled by JS -->
+      </div>
+      <div style="margin-top:12px;" id="split-commits">
+        <div class="skeleton" style="width:80%; margin-bottom:6px;"></div>
+        <div class="skeleton" style="width:60%;"></div>
       </div>
     </div>
   </div>
 
-  <!-- Activity Feed -->
-  <div class="card">
-    <div class="section-title">⚡ Letzte GitHub Aktivität</div>
-    <div id="activity-feed"><div class="empty-state">Lädt Commits...</div></div>
+  <!-- ROW 3: Wins + Team -->
+  <div class="grid-2 section-spacer">
+    <!-- WINS TODAY -->
+    <div class="card">
+      <div class="card-title">🏆 Wins Today · Sprint #12</div>
+      <div class="wins-count">8</div>
+      <div class="wins-subtitle">features shipped this sprint 🚀</div>
+      <div class="wins-grid" id="wins-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- TEAM ENERGY -->
+    <div class="card">
+      <div class="card-title">👥 Team Energy Levels</div>
+      <div class="team-grid" id="team-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
   </div>
 
-</main>
+  <!-- FOOTER -->
+  <div class="footer">
+    ⚡ AI Empire HQ v2.0 · Built with 🔥 · Data refreshes every 60s · <span id="last-updated">updating...</span>
+  </div>
+
+</div>
 
 <script>
-const REPOS = {
-  amber: 'salahxiv/Amber',
-  split: 'salahxiv/split-genesis',
-  factory: 'salahxiv/ai-factory'
-};
+// ═══════════════════════════════════════════
+// PARTICLE SYSTEM
+// ═══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animFrame;
 
-function getToken() { return localStorage.getItem('gh_token') || ''; }
-function saveToken() {
-  const t = document.getElementById('gh-token').value;
-  localStorage.setItem('gh_token', t);
-  document.getElementById('token-bar').style.display = 'none';
-  fetchAll();
-}
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
 
-function headers() {
-  const t = getToken();
-  return t ? { 'Authorization': `token ${t}` } : {};
-}
+  const COLORS = ['rgba(168,85,247,', 'rgba(6,182,212,', 'rgba(16,185,129,'];
 
-async function ghFetch(url) {
-  try {
-    const r = await fetch(`https://api.github.com/${url}`, { headers: headers() });
-    if (!r.ok) return null;
-    return await r.json();
-  } catch { return null; }
-}
-
-// Berlin Time Clock
-function updateClock() {
-  const now = new Date();
-  const berlin = new Intl.DateTimeFormat('de-DE', {
-    timeZone: 'Europe/Berlin', hour:'2-digit', minute:'2-digit', second:'2-digit'
-  }).format(now);
-  document.getElementById('clock').textContent = berlin + ' CET';
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// Countdown to April 29
-function updateCountdown() {
-  const launch = new Date('2026-04-29T00:00:00+02:00');
-  const now = new Date();
-  const diff = launch - now;
-  if (diff <= 0) { document.getElementById('amber-countdown').textContent = '🎉 LIVE!'; return; }
-  const d = Math.floor(diff/86400000);
-  const h = Math.floor((diff%86400000)/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  const s = Math.floor((diff%60000)/1000);
-  document.getElementById('amber-countdown').textContent = `${d}d ${h}h ${m}m ${s}s`;
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
-
-// Days until Mar 22
-function updateDeadlines() {
-  const mar22 = new Date('2026-03-22T00:00:00+01:00');
-  const now = new Date();
-  const days = Math.ceil((mar22-now)/86400000);
-  document.getElementById('days-22mar').textContent = days > 0 ? days : '⚠️ ÜBERFÄLLIG';
-}
-updateDeadlines();
-
-// Fetch PRs
-async function fetchPRs(repo, listId, countId, ciBadgeId) {
-  const prs = await ghFetch(`repos/${repo}/pulls?state=open&per_page=10`);
-  const runs = await ghFetch(`repos/${repo}/actions/runs?per_page=1`);
-  
-  // CI Badge
-  if (runs && runs.workflow_runs && runs.workflow_runs[0]) {
-    const run = runs.workflow_runs[0];
-    const badge = document.getElementById(ciBadgeId);
-    if (run.conclusion === 'success') {
-      badge.textContent = '✅ CI Grün';
-      badge.className = 'ci-badge ci-green';
-    } else if (run.conclusion === 'failure') {
-      badge.textContent = '❌ CI Rot';
-      badge.className = 'ci-badge ci-red';
-    } else {
-      badge.textContent = '🔄 CI läuft';
-      badge.className = 'ci-badge ci-loading';
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 0.5;
+      this.speedX = (Math.random() - 0.5) * 0.4;
+      this.speedY = (Math.random() - 0.5) * 0.4;
+      this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      this.opacity = Math.random() * 0.4 + 0.1;
+      this.life = 1;
+      this.decay = Math.random() * 0.001 + 0.0005;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.life -= this.decay;
+      if (this.life <= 0 || this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+        this.reset();
+        this.life = 1;
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = this.color + (this.opacity * this.life) + ')';
+      ctx.fill();
     }
   }
-  
-  // PRs
-  const listEl = document.getElementById(listId);
-  if (!prs || prs.length === 0) {
-    listEl.innerHTML = '<div class="empty-state">✅ Keine offenen PRs</div>';
-    if (countId) document.getElementById(countId).textContent = '0';
-    return;
+
+  function init() {
+    resize();
+    particles = Array.from({ length: 120 }, () => new Particle());
+    // Random starting positions
+    particles.forEach(p => { p.y = Math.random() * canvas.height; });
   }
-  if (countId) document.getElementById(countId).textContent = prs.length;
-  listEl.innerHTML = prs.slice(0,5).map(pr => `
-    <div class="pr-item">
-      <span class="pr-num">#${pr.number}</span>
-      <span class="pr-title" title="${pr.title}">${pr.title}</span>
+
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 80) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(168,85,247,${0.05 * (1 - dist/80)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    drawConnections();
+    animFrame = requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  animate();
+})();
+
+// ═══════════════════════════════════════════
+// VIBE QUOTES
+// ═══════════════════════════════════════════
+const vibes = [
+  "Building the future, one sprint at a time 🚀",
+  "Your AI army is working while you sleep 💪",
+  "Empire mode: ON 👑",
+  "Code is shipping. History is being made. 🔥",
+  "Every line of code is a brick in the empire 🏰",
+  "You're not building a startup. You're building a legacy. ⚡",
+  "The AI doesn't sleep. Neither does the grind. 🤖",
+  "Small team. Big dreams. Bigger execution. 💎",
+  "Sprint 12 and still going harder than ever 🚀",
+  "While others sleep, you ship. That's the difference. 🌙",
+];
+function getVibeForDay() {
+  const day = Math.floor(Date.now() / 86400000);
+  return vibes[day % vibes.length];
+}
+document.getElementById('vibe-text').textContent = getVibeForDay();
+
+// ═══════════════════════════════════════════
+// COUNTDOWN
+// ═══════════════════════════════════════════
+function updateCountdown() {
+  const launch = new Date('2026-04-29T00:00:00');
+  const now = new Date();
+  const diff = launch - now;
+  const days = Math.ceil(diff / 86400000);
+  document.getElementById('countdown-days').textContent = `T-${days}`;
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ═══════════════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  document.getElementById('time-display').textContent =
+    now.toLocaleString('en-DE', { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Europe/Berlin' }) + ' CET';
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ═══════════════════════════════════════════
+// WINS
+// ═══════════════════════════════════════════
+const wins = [
+  "Aurora & Cosmic Themes (Amber) 🎨",
+  "ntfy.sh Push Notifications (Split) 📬",
+  "82 Unit Tests (Amber) 🧪",
+  "QR Code Group Join (Split) 📸",
+  "Live Exchange Rates (Split) 💱",
+  "Accessibility Audit (Amber) ♿",
+  "Product Hunt Draft fertig 🐱",
+  "App Store Screenshots Guide 📱",
+];
+const winsGrid = document.getElementById('wins-grid');
+wins.forEach((win, i) => {
+  const div = document.createElement('div');
+  div.className = 'win-item';
+  div.style.animationDelay = `${i * 0.1}s`;
+  div.innerHTML = `<span class="win-check">✅</span><span>${win}</span>`;
+  winsGrid.appendChild(div);
+});
+
+// ═══════════════════════════════════════════
+// TEAM ENERGY
+// ═══════════════════════════════════════════
+const team = [
+  { name: 'CTO', emoji: '🏗️', energy: 80, status: 'Reviewing PRs', color: 'var(--purple)' },
+  { name: 'SeniorDev', emoji: '💻', energy: 100, status: 'Shipping code 🔥', color: 'var(--green)' },
+  { name: 'Marketing', emoji: '📣', energy: 70, status: 'Product Hunt prep', color: 'var(--cyan)' },
+  { name: 'DevOps', emoji: '⚙️', energy: 85, status: 'CI pipelines hot', color: 'var(--orange)' },
+  { name: 'ProductOwner', emoji: '📋', energy: 90, status: 'Backlog grooming', color: 'var(--purple)' },
+  { name: 'Secretary', emoji: '📝', energy: 75, status: 'CEO briefings', color: 'var(--cyan)' },
+];
+const teamGrid = document.getElementById('team-grid');
+team.forEach(member => {
+  const div = document.createElement('div');
+  div.className = 'team-card';
+  div.innerHTML = `
+    <div class="team-name">${member.emoji} ${member.name}</div>
+    <div class="team-status">${member.status}</div>
+    <div class="energy-bar-wrap">
+      <div style="position:relative; margin-top:16px;">
+        <div style="position:absolute; top:-16px; right:0; font-size:0.65rem; font-family:'JetBrains Mono',monospace; color:${member.color};">${member.energy}%</div>
+      </div>
+      <div class="energy-bar-bg">
+        <div class="energy-bar-fill" style="width:${member.energy}%; background:linear-gradient(90deg, ${member.color}, ${member.color}88); box-shadow: 0 0 8px ${member.color}44;"></div>
+      </div>
     </div>
-  `).join('');
+  `;
+  teamGrid.appendChild(div);
+});
+
+// ═══════════════════════════════════════════
+// COMMIT DOTS
+// ═══════════════════════════════════════════
+function renderDots(containerId, commits) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const levels = commits || Array.from({length:28}, () => Math.random() > 0.4 ? (Math.random() > 0.5 ? 'active' : 'medium') : '');
+  levels.forEach((level, i) => {
+    const dot = document.createElement('div');
+    dot.className = `commit-dot ${level}`;
+    if (level === 'active') {
+      dot.style.animationDelay = `${i * 0.1}s`;
+    }
+    container.appendChild(dot);
+  });
 }
 
-// Fetch Issues count
-async function fetchIssues(repo, countId) {
-  const issues = await ghFetch(`repos/${repo}/issues?state=open&per_page=1`);
-  // GitHub returns issues + PRs, use link header or just show count
-  if (issues && countId) {
-    document.getElementById(countId).textContent = issues.length > 0 ? '...' : '0';
+// ═══════════════════════════════════════════
+// GITHUB API
+// ═══════════════════════════════════════════
+async function fetchGitHub(path) {
+  try {
+    const r = await fetch(`https://api.github.com/${path}`, {
+      headers: { 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  } catch(e) {
+    console.warn('GitHub API error:', e);
+    return null;
   }
 }
 
-// Activity Feed
-async function fetchActivity() {
-  const [amberCommits, splitCommits] = await Promise.all([
-    ghFetch(`repos/${REPOS.amber}/commits?per_page=5`),
-    ghFetch(`repos/${REPOS.split}/commits?per_page=5`)
+async function loadRepoData(repo, prefix) {
+  const [repoData, prs, commits, runs] = await Promise.all([
+    fetchGitHub(`repos/salahxiv/${repo}`),
+    fetchGitHub(`repos/salahxiv/${repo}/pulls?state=all&per_page=20`),
+    fetchGitHub(`repos/salahxiv/${repo}/commits?per_page=10`),
+    fetchGitHub(`repos/salahxiv/${repo}/actions/runs?per_page=5`),
   ]);
-  
-  let items = [];
-  const addCommits = (commits, repo) => {
-    if (!commits) return;
-    commits.forEach(c => items.push({
-      repo: repo === REPOS.amber ? 'Amber' : 'Split',
-      msg: c.commit.message.split('\n')[0].substring(0, 60),
-      time: new Date(c.commit.committer.date),
-      url: c.html_url
-    }));
-  };
-  addCommits(amberCommits, REPOS.amber);
-  addCommits(splitCommits, REPOS.split);
-  items.sort((a,b) => b.time - a.time);
-  
-  const feed = document.getElementById('activity-feed');
-  if (items.length === 0) { feed.innerHTML = '<div class="empty-state">Keine Daten</div>'; return; }
-  
-  feed.innerHTML = items.slice(0,10).map(i => {
-    const ago = Math.floor((Date.now() - i.time)/60000);
-    const timeAgo = ago < 60 ? `${ago}m` : `${Math.floor(ago/60)}h`;
-    return `<div class="activity-item">
-      <span class="activity-repo">${i.repo}</span>
-      <span class="activity-msg">${i.msg}</span>
-      <span class="activity-time">${timeAgo} ago</span>
-    </div>`;
-  }).join('');
+
+  // Meta
+  const metaEl = document.getElementById(`${prefix}-meta`);
+  if (repoData) {
+    metaEl.textContent = `⭐ ${repoData.stargazers_count} · 🍴 ${repoData.forks_count} · Updated: ${new Date(repoData.pushed_at).toLocaleDateString('de-DE')}`;
+  }
+
+  // Stats
+  const statsEl = document.getElementById(`${prefix}-stats`);
+  statsEl.innerHTML = '';
+  if (prs) {
+    const openPRs = prs.filter(p => p.state === 'open').length;
+    const mergedToday = prs.filter(p => {
+      if (!p.merged_at) return false;
+      const d = new Date(p.merged_at);
+      const today = new Date();
+      return d.toDateString() === today.toDateString();
+    }).length;
+    statsEl.innerHTML += `<div class="stat-pill pr">🔀 ${openPRs} open PRs</div>`;
+    if (mergedToday > 0) {
+      statsEl.innerHTML += `<div class="stat-pill ci">✅ ${mergedToday} merged today</div>`;
+      // Update sprint PR count
+      const prCountEl = document.getElementById('pr-count-today');
+      const current = parseInt(prCountEl.textContent) || 0;
+      if (!isNaN(current)) prCountEl.textContent = `🔀 ${current + mergedToday} PRs merged today`;
+      else prCountEl.textContent = `🔀 ${mergedToday} PRs merged today`;
+    }
+  }
+  if (commits) {
+    statsEl.innerHTML += `<div class="stat-pill commit">📝 ${commits.length} recent commits</div>`;
+  }
+
+  // CI Status
+  const ciBadgeEl = document.getElementById(`${prefix}-ci-badge`);
+  if (runs && runs.workflow_runs && runs.workflow_runs.length > 0) {
+    const latest = runs.workflow_runs[0];
+    let ciClass = 'running';
+    let ciText = 'running';
+    if (latest.conclusion === 'success') { ciClass = 'pass'; ciText = '✓ passing'; }
+    else if (latest.conclusion === 'failure') { ciClass = 'fail'; ciText = '✗ failing'; }
+    else { ciText = '⟳ running'; }
+    ciBadgeEl.innerHTML = `<div class="ci-dot ${ciClass}"></div><span style="color:var(--text);">${ciText}</span>`;
+
+    // Update header CI dots
+    const headerDot = document.getElementById(`${prefix === 'amber' ? 'amber' : 'split'}-ci`);
+    if (headerDot) headerDot.className = `ci-dot ${ciClass}`;
+  } else {
+    ciBadgeEl.innerHTML = `<div class="ci-dot pass"></div><span style="color:var(--text);">active</span>`;
+  }
+
+  // Recent commits
+  const commitsEl = document.getElementById(`${prefix}-commits`);
+  if (commits && commits.length > 0) {
+    commitsEl.innerHTML = commits.slice(0,3).map(c => {
+      const msg = c.commit.message.split('\n')[0].substring(0,50);
+      const author = c.commit.author.name.substring(0,15);
+      const date = new Date(c.commit.author.date).toLocaleDateString('de-DE');
+      return `<div style="font-size:0.72rem; color:var(--text-dim); font-family:'JetBrains Mono',monospace; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+        <span style="color:var(--text);">${msg}</span>
+        <span style="color:var(--text-dim);"> · ${author} · ${date}</span>
+      </div>`;
+    }).join('');
+
+    // Render commit dots based on real data
+    const dotLevels = Array.from({length:28}, (_, i) => {
+      if (i < commits.length) return 'active';
+      if (i < commits.length * 2) return 'medium';
+      return '';
+    });
+    renderDots(`${prefix}-dots`, dotLevels);
+  } else {
+    renderDots(`${prefix}-dots`, null);
+    commitsEl.innerHTML = '<div class="loading-text">No commit data available</div>';
+  }
 }
 
-// Auto refresh
-let countdown = 60;
-function tick() {
-  countdown--;
-  document.getElementById('refresh-badge').textContent = `↻ ${countdown}s`;
-  if (countdown <= 0) { countdown = 60; fetchAll(); }
-}
-setInterval(tick, 1000);
+async function initDashboard() {
+  // Render placeholder dots first
+  renderDots('amber-dots', null);
+  renderDots('split-dots', null);
 
-async function fetchAll() {
-  document.getElementById('last-updated').textContent = 'Aktualisiert: ' + new Date().toLocaleTimeString('de-DE', {timeZone:'Europe/Berlin'});
-  await Promise.all([
-    fetchPRs(REPOS.amber, 'amber-prs', null, 'amber-ci'),
-    fetchPRs(REPOS.split, 'split-prs', 'split-prs-count', 'split-ci'),
-    fetchActivity()
-  ]);
+  // Set initial PR count display
+  document.getElementById('pr-count-today').textContent = '⏳ fetching...';
+
+  try {
+    await Promise.all([
+      loadRepoData('Amber', 'amber'),
+      loadRepoData('split-genesis', 'split'),
+    ]);
+
+    // If pr-count-today still shows fetching, set to 0
+    const prEl = document.getElementById('pr-count-today');
+    if (prEl.textContent.includes('fetching')) {
+      prEl.textContent = '🔀 0 PRs merged today';
+    }
+  } catch(e) {
+    console.error('Dashboard init error:', e);
+  }
+
+  document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleTimeString('de-DE')}`;
 }
 
-// Init
-if (getToken()) document.getElementById('token-bar').style.display = 'none';
-else document.getElementById('gh-token').value = getToken();
-fetchAll();
+initDashboard();
+// Refresh every 60s
+setInterval(() => {
+  initDashboard();
+}, 60000);
+
+// ═══════════════════════════════════════════
+// CONFETTI on load
+// ═══════════════════════════════════════════
+function spawnConfetti() {
+  const emojis = ['🚀','⚡','🔥','👑','💎','🌟'];
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = (20 + Math.random() * 60) + 'vw';
+      el.style.bottom = '0';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }, i * 200);
+  }
+}
+setTimeout(spawnConfetti, 800);
 </script>
 </body>
 </html>
